@@ -9,8 +9,8 @@ class Controller {
       const zukan_id_from = (page === '1') ? 1 : (parseInt(page) - 1) * parseInt(limit) + 1;
       const zukan_id_to = parseInt(page) * parseInt(limit);
 
-      const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1?pokemon_ability_id=&zukan_id_from=${zukan_id_from}&zukan_id_to=${zukan_id_to}`);   
-
+      const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1?pokemon_ability_id=&zukan_id_from=${zukan_id_from}&zukan_id_to=${zukan_id_to}`);  
+      
       const updatedData = data.pokemons.map((item: any) => {
         item.file_name = "https://id.portal-pokemon.com/play/resources/pokedex" + item.file_name;
         return item;
@@ -22,8 +22,8 @@ class Controller {
         "data": updatedData,
         "meta": {
           "limit": limit,
-          "page": page
-        }
+          "page": page,
+        },
       });
     } catch (err) {
       next(err);
