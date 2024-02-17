@@ -4,7 +4,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 class Controller {
   public static async fetchDatabase(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { limit = '10', page = '1' } = req.query as Record<string, string>;
+      const { limit = '12', page = '1' } = req.query as Record<string, string>;
 
       const zukan_id_from = (page === '1') ? 1 : (parseInt(page) - 1) * parseInt(limit) + 1;
       const zukan_id_to = parseInt(page) * parseInt(limit);
@@ -20,7 +20,7 @@ class Controller {
         "status": true,
         "error": null,
         "data": updatedData,
-        "info": {
+        "meta": {
           "limit": limit,
           "page": page
         }
