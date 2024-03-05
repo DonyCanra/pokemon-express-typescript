@@ -1,28 +1,45 @@
-import { Request, Response, NextFunction } from 'express';
-import axios, { AxiosRequestConfig } from 'axios';
+import { Request, Response, NextFunction } from "express";
+import axios, { AxiosRequestConfig } from "axios";
+import PokemonData from "../interfaces/PokemonData";
+
 
 class Controller {
   public static async fetchPokemon(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { limit = '12', page = '1' } = req.query as Record<string, string>;
+      const { limit = "12", page = "1" } = req.query as Record<string, string>;
 
-      const zukan_id_from = (page === '1') ? 1 : (parseInt(page) - 1) * parseInt(limit) + 1;
+      const zukan_id_from = page === "1" ? 1 : (parseInt(page) - 1) * parseInt(limit) + 1;
       const zukan_id_to = parseInt(page) * parseInt(limit);
 
-      const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1?pokemon_ability_id=&zukan_id_from=${zukan_id_from}&zukan_id_to=${zukan_id_to}`);  
-      
+      const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1?pokemon_ability_id=&zukan_id_from=${zukan_id_from}&zukan_id_to=${zukan_id_to}`);
+
       const updatedData = data.pokemons.map((item: any) => {
         item.file_name = "https://id.portal-pokemon.com/play/resources/pokedex" + item.file_name;
         return item;
       });
 
+      function convertToPascalCase(key: string): string {
+        return key.replace(/_([a-z])/g, (_, group1) => group1.toUpperCase());
+      }
+
+      const result = updatedData.map((item: PokemonData) => {
+        const updatedItem: any = {}; // Gunakan Partial<PokemonData> di sini
+        for (const key in item) {
+          if (Object.prototype.hasOwnProperty.call(item, key)) {
+            const typedKey = key as keyof PokemonData;
+            updatedItem[convertToPascalCase(typedKey)] = item[typedKey];
+          }
+        }
+        return updatedItem as PokemonData;
+      });
+
       res.status(200).json({
-        "status": true,
-        "error": null,
-        "data": updatedData,
-        "meta": {
-          "limit": limit,
-          "page": page,
+        status: true,
+        error: null,
+        data: result,
+        meta: {
+          limit: parseInt(limit),
+          page: parseInt(page),
         },
       });
     } catch (err) {
@@ -32,22 +49,21 @@ class Controller {
 
   public static async fetchPokemonRandom(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { limit = '12' } = req.query as Record<string, string>;
+      const { limit = "12" } = req.query as Record<string, string>;
 
+      const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1/random?limit=${limit}`);
 
-      const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1/random?limit=${limit}`);  
-      
       const updatedData = data.pokemons.map((item: any) => {
         item.file_name = "https://id.portal-pokemon.com/play/resources/pokedex" + item.file_name;
         return item;
       });
 
       res.status(200).json({
-        "status": true,
-        "error": null,
-        "data": updatedData,
-        "meta": {
-          "limit": limit,
+        status: true,
+        error: null,
+        data: updatedData,
+        meta: {
+          limit: limit,
         },
       });
     } catch (err) {
@@ -57,29 +73,39 @@ class Controller {
 
   public static async fetchPokemonByWord(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { word = 'Mega' } = req.query as Record<string, string>;
+      const { id = "0001" } = req.params as Record<string, string>;
 
+      const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1?key_word=${id}`);
 
-      const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1?key_word=${word}`);  
-      
       const updatedData = data.pokemons.map((item: any) => {
         item.file_name = "https://id.portal-pokemon.com/play/resources/pokedex" + item.file_name;
         return item;
       });
 
+      function convertToPascalCase(key: string): string {
+        return key.replace(/_([a-z])/g, (_, group1) => group1.toUpperCase());
+      }
+
+      const result = updatedData.map((item: PokemonData) => {
+        const updatedItem: any = {}; // Gunakan Partial<PokemonData> di sini
+        for (const key in item) {
+          if (Object.prototype.hasOwnProperty.call(item, key)) {
+            const typedKey = key as keyof PokemonData;
+            updatedItem[convertToPascalCase(typedKey)] = item[typedKey];
+          }
+        }
+        return updatedItem as PokemonData;
+      });
+
       res.status(200).json({
-        "status": true,
-        "error": null,
-        "data": updatedData,
+        status: true,
+        error: null,
+        data: result,
       });
     } catch (err) {
       next(err);
     }
   }
-
 }
 
 export default Controller;
-
-// https://id.portal-pokemon.com/play/pokedex/api/v1?key_word=bul
-// https://id.portal-pokemon.com/play/pokedex/api/v1/random?limit=13

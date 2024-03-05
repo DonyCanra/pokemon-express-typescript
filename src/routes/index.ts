@@ -5,6 +5,6 @@ const router = express.Router()
 // define the home page route
 router.get('/', Controller.fetchPokemon)
 router.get('/random', Controller.fetchPokemonRandom)
-router.get('/search', Controller.fetchPokemonByWord)
+router.get('/:id', Controller.fetchPokemonByWord)
 
 module.exports = router
