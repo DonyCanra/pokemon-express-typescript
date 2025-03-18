@@ -1,20 +1,20 @@
-import { Request, Response, NextFunction } from "express";
-import axios, { AxiosRequestConfig } from "axios";
-import PokemonData from "../interfaces/PokemonData";
+import { Request, Response, NextFunction } from 'express';
+import axios from 'axios';
+import PokemonData from '../interfaces/PokemonData';
 
 
 class Controller {
   public static async fetchPokemon(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { limit = "12", page = "1" } = req.query as Record<string, string>;
+      const { limit = '12', page = '1' } = req.query as Record<string, string>;
 
-      const zukan_id_from = page === "1" ? 1 : (parseInt(page) - 1) * parseInt(limit) + 1;
-      const zukan_id_to = parseInt(page) * parseInt(limit);
+      const zukanIdFrom = page === '1' ? 1 : (parseInt(page) - 1) * parseInt(limit) + 1;
+      const zukanIdTo = parseInt(page) * parseInt(limit);
 
-      const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1?pokemon_ability_id=&zukan_id_from=${zukan_id_from}&zukan_id_to=${zukan_id_to}`);
+      const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1?pokemon_ability_id=&zukan_id_from=${zukanIdFrom}&zukan_id_to=${zukanIdTo}`);
 
       const updatedData = data.pokemons.map((item: any) => {
-        item.file_name = "https://id.portal-pokemon.com/play/resources/pokedex" + item.file_name;
+        item.file_name = 'https://id.portal-pokemon.com/play/resources/pokedex' + item.file_name;
         return item;
       });
 
@@ -49,12 +49,13 @@ class Controller {
 
   public static async fetchPokemonRandom(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { limit = "12" } = req.query as Record<string, string>;
+      const { limit = '12' } = req.query as Record<string, string>;
 
       const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1/random?limit=${limit}`);
 
+      
       const updatedData = data.pokemons.map((item: any) => {
-        item.file_name = "https://id.portal-pokemon.com/play/resources/pokedex" + item.file_name;
+        item.file_name = 'https://id.portal-pokemon.com/play/resources/pokedex' + item.file_name;
         return item;
       });
 
@@ -73,12 +74,12 @@ class Controller {
 
   public static async fetchPokemonByWord(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id = "0001" } = req.params as Record<string, string>;
+      const { id = '0001' } = req.params as Record<string, string>;
 
       const { data } = await axios.get(`https://id.portal-pokemon.com/play/pokedex/api/v1?key_word=${id}`);
 
       const updatedData = data.pokemons.map((item: any) => {
-        item.file_name = "https://id.portal-pokemon.com/play/resources/pokedex" + item.file_name;
+        item.file_name = 'https://id.portal-pokemon.com/play/resources/pokedex' + item.file_name;
         return item;
       });
 
